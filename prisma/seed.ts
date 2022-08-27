@@ -16,7 +16,25 @@ async function main() {
     });
   }
 
+  const ticketsPresential = await prisma.ticket.findMany({ where: { presential: true, userId: null } });
+  const ticketsOnline = await prisma.ticket.findMany({ where: { presential: false, userId: null } });
+  if (ticketsPresential.length <= 0 || ticketsOnline.length <= 0) {
+    await prisma.ticket.createMany({
+      data: [
+        { presential: true, userId: null },
+        { presential: true, userId: null },
+        { presential: true, userId: null },
+        { presential: false, userId: null },
+        { presential: false, userId: null },
+        { presential: false, userId: null },
+      ],
+      skipDuplicates: true,
+    });
+  }
+
   console.log({ event });
+  console.log({ ticketsPresential });
+  console.log({ ticketsOnline });
 }
 
 main()
