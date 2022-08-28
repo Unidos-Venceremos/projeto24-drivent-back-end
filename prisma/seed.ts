@@ -32,6 +32,26 @@ async function main() {
     });
   }
 
+  const pallaceHotel = {
+    name: 'Pallace Hotel',
+  };
+  const hotelCreated = await prisma.hotel.create({ data: pallaceHotel });
+
+  await prisma.bedroom.createMany({
+    data: [
+      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
+      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
+    ],
+    skipDuplicates: true,
+  });
+
   console.log({ event });
   console.log({ ticketsPresential });
   console.log({ ticketsOnline });
