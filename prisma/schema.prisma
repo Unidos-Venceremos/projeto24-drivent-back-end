@@ -75,3 +75,31 @@ model Ticket {
   userId     Int?
   User       User?   @relation(fields: [userId], references: [id])
 }
+
+model Hotel {
+  id                  Int       @id @default(autoincrement())
+  name                String    @unique
+  singleAccommodation Boolean   @default(true)
+  doubleAccommodation Boolean   @default(true)
+  tripleAccommodation Boolean   @default(true)
+  bedrooms            Bedroom[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Bedroom {
+  id           Int       @id @default(autoincrement())
+  hotelId      Int
+  enrollmentId Int?      @unique
+  typeRoom     typesRoom
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  Hotel Hotel @relation(fields: [hotelId], references: [id])
+}
+
+enum typesRoom {
+  SINGLE
+  DOUBLE
+  TRIPLE
+}
