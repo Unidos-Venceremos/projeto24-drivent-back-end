@@ -35,7 +35,11 @@ async function main() {
   const pallaceHotel = {
     name: 'Pallace Hotel',
   };
-  const hotelCreated = await prisma.hotel.create({ data: pallaceHotel });
+  const hotelCreated = await prisma.hotel.upsert({
+    where: { name: pallaceHotel.name },
+    update: pallaceHotel,
+    create: pallaceHotel,
+  })
 
   await prisma.bedroom.createMany({
     data: [
