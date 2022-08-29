@@ -17,6 +17,6 @@ export async function getTicketByuserId(req: AuthenticatedRequest, res: Response
 
 export async function updateTicket(req: AuthenticatedRequest, res: Response) {
   const { userId, bool } = req.body;
-  const ticket = await ticketsService.updateTicket(bool, Number(userId));
+  const ticket = await ticketsService.updateTicket(Number(userId), bool);
   return res.status(httpStatus.OK).send(ticket);
 }
