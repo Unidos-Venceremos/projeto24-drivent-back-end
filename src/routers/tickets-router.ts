@@ -7,7 +7,7 @@ const ticketsRouter = Router();
 ticketsRouter
   .all('/*', authenticateToken)
   .get('/', getAllAvailableTickets)
-  .get('/:userId', getTicketByuserId)
-  .put('/', updateTicket);
+  .get('/userId', getTicketByuserId)
+  .put('/:presential', updateTicket);
 
 export { ticketsRouter };
