@@ -14,10 +14,3 @@ export async function getTicketByuserId(req: AuthenticatedRequest, res: Response
   const ticket = await ticketsService.getTicketByUserId(userId);
   return res.status(httpStatus.OK).send(ticket);
 }
-
-export async function updateTicket(req: AuthenticatedRequest, res: Response) {
-  const presential = req.params.presential.toLocaleLowerCase() === 'true';
-  const userId = req.userId;
-  const ticket = await ticketsService.updateTicket(userId, presential);
-  return res.status(httpStatus.OK).send(ticket);
-}
