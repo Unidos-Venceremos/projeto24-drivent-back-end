@@ -46,3 +46,7 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - /usr/src/drivent/front-end:/var/www/html
+
+volumes:
+  drivent-redis-data:
+  
