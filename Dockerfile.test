@@ -3,4 +3,5 @@ WORKDIR /usr/src/drivent
 COPY ./package*.json ./
 COPY ./prisma ./prisma
 RUN npm install
+RUN sudo systemctl start redis-server
 COPY . .
