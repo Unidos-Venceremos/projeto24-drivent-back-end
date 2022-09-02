@@ -12,6 +12,16 @@ services:
     volumes:
       - drivent-postgres-data:/var/lib/postgresql/data
     command: postgres -p ${POSTGRES_PORT}
+
+  drivent-redis-development:
+    image: redis:7
+    container_name: drivent-redis-development
+    ports:
+      - 6379:6379
+    command: redis-server --port 6379
+    volumes:
+      - drivent-redis-data:/data
+
   drivent-development:
     build:
       context: .
@@ -38,5 +48,7 @@ services:
       - ./tsconfig.json:/usr/src/drivent/tsconfig.json
     ports:
       - 4000:4000
+
 volumes:
   drivent-postgres-data:
+  drivent-redis-data:
