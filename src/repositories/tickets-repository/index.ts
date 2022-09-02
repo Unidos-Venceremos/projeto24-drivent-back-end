@@ -1,12 +1,24 @@
 import { prisma } from '@/config';
 import { Ticket } from '@prisma/client';
+import { Payment } from '@prisma/client';
 
 async function getAvailabeTickets(): Promise<GetAvailabeTicketsParams[]> {
   return prisma.ticket.findMany({ where: { userId: null } });
 }
 
 async function getTicketByUserId(userId: number): Promise<Ticket> {
-  return prisma.ticket.findFirst({ where: { userId } });
+  return prisma.ticket.findFirst({
+    where: {
+      userId,
+    },
+    include: {
+      Payment: {
+        select: {
+          withHotel: true,
+        },
+      },
+    },
+  });
 }
 
 async function updateTicket(ticketId: number, userId: number): Promise<Ticket> {

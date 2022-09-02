@@ -116,7 +116,7 @@ model Payment {
   expiry    String   @db.VarChar(255)
   ticketId  Int
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  withHotel Boolean
+  withHotel Boolean 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
