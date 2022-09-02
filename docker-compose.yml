@@ -23,9 +23,9 @@ services:
     container_name: drivent-redis-production
     ports:
       - 6379:6379
-    command: redis-server --port 6379
+    command: sudo service redis-server start --port 6379
     volumes:
-      - drivent-redis-data:/data
+      - ~/data/drivent/postgres-test:/data
 
   drivent-postgres-production:
     image: postgres:13-alpine
@@ -46,7 +46,3 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - /usr/src/drivent/front-end:/var/www/html
-
-volumes:
-  drivent-redis-data:
-  

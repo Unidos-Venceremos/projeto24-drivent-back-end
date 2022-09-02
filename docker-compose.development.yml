@@ -18,7 +18,7 @@ services:
     container_name: drivent-redis-development
     ports:
       - 6379:6379
-    command: redis-server --port 6379
+    command: sudo service redis-server start --port 6379
     volumes:
       - drivent-redis-data:/data
 

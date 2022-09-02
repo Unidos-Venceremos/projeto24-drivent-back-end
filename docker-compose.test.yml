@@ -18,9 +18,9 @@ services:
     container_name: drivent-redis-test
     ports:
       - 6379:6379
-    command: redis-server --port 6379
+    command: sudo service redis-server start --port 6379
     volumes:
-      - drivent-redis-data:/data
+      - ~/data/drivent/postgres-test:/data
 
   drivent-test:
     build:
@@ -45,6 +45,3 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
-
-volumes:
-  drivent-redis-data:
