@@ -11,6 +11,7 @@ import { handleApplicationErrors } from '@/middlewares';
 import {
   usersRouter,
   authenticationRouter,
+  oauthRouter,
   eventsRouter,
   enrollmentsRouter,
   ticketsRouter,
@@ -24,6 +25,7 @@ app
   .get('/health', (_req, res) => res.send('OK!'))
   .use('/users', usersRouter)
   .use('/auth', authenticationRouter)
+  .use('/oauth', oauthRouter)
   .use('/event', eventsRouter)
   .use('/enrollments', enrollmentsRouter)
   .use('/tickets', ticketsRouter)
