@@ -1,3 +1,4 @@
+import { EXPIRATION, redis } from '@/config';
 import { notFoundError } from '@/errors';
 import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
@@ -5,17 +6,36 @@ import { exclude } from '@/utils/prisma-utils';
 import { Address, Enrollment } from '@prisma/client';
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
-  const enrollmentWithAddress = await enrollmentRepository.findWithAddressByUserId(userId);
+  const cacheKey = `getOneWithAddressByUserId?userId=${userId}`;
+  const cache = await redis.get(cacheKey);
+  if (cache) {
+    const cacheData: {
+      address: GetAddressResult;
+      id: number;
+      name: string;
+      cpf: string;
+      birthday: Date;
+      phone: string;
+    } = JSON.parse(cache);
 
-  if (!enrollmentWithAddress) throw notFoundError();
+    return cacheData;
+  } else {
+    const enrollmentWithAddress = await enrollmentRepository.findWithAddressByUserId(userId);
 
-  const [firstAddress] = enrollmentWithAddress.Address;
-  const address = getFirstAddress(firstAddress);
+    if (!enrollmentWithAddress) throw notFoundError();
 
-  return {
-    ...exclude(enrollmentWithAddress, 'userId', 'createdAt', 'updatedAt', 'Address'),
-    ...(!!address && { address }),
-  };
+    const [firstAddress] = enrollmentWithAddress.Address;
+    const address = getFirstAddress(firstAddress);
+
+    const data = {
+      ...exclude(enrollmentWithAddress, 'userId', 'createdAt', 'updatedAt', 'Address'),
+      ...(!!address && { address }),
+    };
+
+    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+
+    return data;
+  }
 }
 
 type GetOneWithAddressByUserIdResult = Omit<Enrollment, 'userId' | 'createdAt' | 'updatedAt'>;

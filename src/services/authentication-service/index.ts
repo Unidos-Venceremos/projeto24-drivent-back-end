@@ -1,3 +1,4 @@
+import { EXPIRATION, redis } from '@/config';
 import sessionRepository from '@/repositories/session-repository';
 import userRepository from '@/repositories/user-repository';
 import { exclude } from '@/utils/prisma-utils';
@@ -22,10 +23,19 @@ async function signIn(params: SignInParams): Promise<SignInResult> {
 }
 
 async function getUserOrFail(email: string): Promise<GetUserOrFailResult> {
-  const user = await userRepository.findByEmail(email, { id: true, email: true, password: true });
-  if (!user) throw invalidCredentialsError();
+  const cacheKey = `getUserOrFail?email=${email}`;
+  const cache = await redis.get(cacheKey);
+  if (cache) {
+    const cacheData: User = JSON.parse(cache);
 
-  return user;
+    return cacheData;
+  } else {
+    const user = await userRepository.findByEmail(email, { id: true, email: true, password: true });
+    if (!user) throw invalidCredentialsError();
+    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(user));
+
+    return user;
+  }
 }
 
 async function createSession(userId: number) {

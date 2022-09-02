@@ -1,5 +1,5 @@
 import { init } from '@/app';
-import { prisma } from '@/config';
+import { prisma, redis } from '@/config';
 import userService, { duplicatedEmailError } from '@/services/users-service';
 import faker from '@faker-js/faker';
 import bcrypt from 'bcrypt';
@@ -9,6 +9,10 @@ import { cleanDb } from '../helpers';
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+beforeEach(async () => {
+  redis.flushAll();
 });
 
 describe('createUser', () => {
