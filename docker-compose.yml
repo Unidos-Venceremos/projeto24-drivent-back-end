@@ -20,7 +20,7 @@ services:
 
   drivent-redis-production:
     image: redis:7
-    container_name: drivent-redis-development
+    container_name: drivent-redis-production
     ports:
       - 6379:6379
     command: redis-server --port 6379

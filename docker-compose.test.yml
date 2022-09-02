@@ -15,7 +15,7 @@ services:
 
   drivent-redis-test:
     image: redis:7
-    container_name: drivent-redis-development
+    container_name: drivent-redis-test
     ports:
       - 6379:6379
     command: redis-server --port 6379
@@ -48,4 +48,3 @@ services:
 
 volumes:
   drivent-redis-data:
-  
