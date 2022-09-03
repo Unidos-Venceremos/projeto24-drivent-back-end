@@ -16,6 +16,7 @@ import {
   enrollmentsRouter,
   ticketsRouter,
   bedroomsRouter,
+  oauthRouter,
 } from '@/routers';
 
 const app = express();
@@ -25,18 +26,7 @@ app
   .get('/health', (_req, res) => res.send('OK!'))
   .use('/users', usersRouter)
   .use('/auth', authenticationRouter)
-  .use('/oauth', 
-    async(req, res) => {
-      console.log('signInOauthPost');
-      const code = req.query.code;
-      console.log(code);
-      const response = await axios.post(`https://github.com/login/oauth/access_token`, {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        code
-      });
-    }
-  )
+  .use('/oauth', oauthRouter)
   .use('/event', eventsRouter)
   .use('/enrollments', enrollmentsRouter)
   .use('/tickets', ticketsRouter)
