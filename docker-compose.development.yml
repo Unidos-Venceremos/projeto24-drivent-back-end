@@ -18,7 +18,7 @@ services:
     container_name: drivent-redis-development
     restart: always
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - 6379:6379
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes:
       - drivent-redis-data:/data
