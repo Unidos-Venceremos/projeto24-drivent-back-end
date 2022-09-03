@@ -8,3 +8,9 @@ export async function getAllAvailableTickets(req: AuthenticatedRequest, res: Res
 
   return res.status(httpStatus.OK).send(availableTickets);
 }
+
+export async function getTicketByuserId(req: AuthenticatedRequest, res: Response) {
+  const userId = req.userId;
+  const ticket = await ticketsService.getTicketByUserId(userId);
+  return res.status(httpStatus.OK).send(ticket);
+}
