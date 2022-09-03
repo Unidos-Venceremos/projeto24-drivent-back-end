@@ -17,9 +17,12 @@ export async function signInOauthPost(req: Request, res: Response) {
     password: token.toString() 
   });
     
-  res.status(httpStatus.CREATED).json({
-    id: user.id,
-    email: user.email,
+  res.status(httpStatus.CREATED).send({
+    user:{
+      id: user.id,
+      email: user.email,
+    },
+    token,
   });
 }
 
