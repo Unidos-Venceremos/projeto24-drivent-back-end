@@ -30,9 +30,9 @@ services:
     container_name: drivent-development
     depends_on:
       drivent-redis-development:
-        condition: service started
+        condition: service_started
       drivent-postgres-development:
-        condition: service started
+        condition: service_started
     logging:
       driver: 'json-file'
       options:

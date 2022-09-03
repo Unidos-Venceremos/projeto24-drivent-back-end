@@ -30,9 +30,9 @@ services:
     container_name: drivent-test
     depends_on:
       drivent-redis-test:
-        condition: service started
+        condition: service_started
       drivent-postgres-test:
-        condition: service started
+        condition: service_started
     logging:
       driver: 'json-file'
       options:
