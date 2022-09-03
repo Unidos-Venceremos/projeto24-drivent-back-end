@@ -14,13 +14,14 @@ services:
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-test:
-    image: redis:7
+    image: redis:7-alpine
     container_name: drivent-redis-test
+    restart: always
     ports:
       - 6379:6379
-    command: sudo service redis-server start --port 6379
+    command: redis-server
     volumes:
-      - ~/data/drivent/postgres-test:/data
+      - drivent-redis-data:/data
 
   drivent-test:
     build:
@@ -29,6 +30,7 @@ services:
     container_name: drivent-test
     depends_on:
       - drivent-postgres-test
+      - drivent-redis-test
     logging:
       driver: 'json-file'
       options:
@@ -45,3 +47,6 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
+
+volumes:
+  drivent-redis-data:

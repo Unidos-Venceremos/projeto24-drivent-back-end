@@ -14,11 +14,12 @@ services:
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-development:
-    image: redis:7
+    image: redis:7-alpine
     container_name: drivent-redis-development
+    restart: always
     ports:
       - 6379:6379
-    command: sudo service redis-server start --port 6379
+    command: redis-server
     volumes:
       - drivent-redis-data:/data
 
@@ -29,6 +30,7 @@ services:
     container_name: drivent-development
     depends_on:
       - drivent-postgres-development
+      - drivent-redis-development
     logging:
       driver: 'json-file'
       options:

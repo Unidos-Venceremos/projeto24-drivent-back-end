@@ -19,13 +19,14 @@ services:
       JWT_SECRET: ${JWT_SECRET}
 
   drivent-redis-production:
-    image: redis:7
+    image: redis:7-alpine
     container_name: drivent-redis-production
+    restart: always
     ports:
       - 6379:6379
-    command: sudo service redis-server start --port 6379
+    command: redis-server
     volumes:
-      - ~/data/drivent/postgres-test:/data
+      - drivent-redis-data:/data
 
   drivent-postgres-production:
     image: postgres:13-alpine
@@ -38,6 +39,7 @@ services:
     volumes:
       - /usr/local/drivent-pg/data:/var/lib/postgresql/data
     command: postgres -p ${POSTGRES_PORT}
+
   drivent-nginx:
     image: nginx
     ports:
@@ -46,3 +48,6 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - /usr/src/drivent/front-end:/var/www/html
+
+volumes:
+  drivent-redis-data:
