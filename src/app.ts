@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'express-async-errors';
 import express, { Express } from 'express';
 import cors from 'cors';
+import axios from 'axios';
 
 import { loadEnv, connectDb, disconnectDB } from '@/config';
 
@@ -11,7 +12,6 @@ import { handleApplicationErrors } from '@/middlewares';
 import {
   usersRouter,
   authenticationRouter,
-  oauthRouter,
   eventsRouter,
   enrollmentsRouter,
   ticketsRouter,
@@ -25,7 +25,18 @@ app
   .get('/health', (_req, res) => res.send('OK!'))
   .use('/users', usersRouter)
   .use('/auth', authenticationRouter)
-  .use('/oauth', oauthRouter)
+  .use('/oauth', 
+    async(req, res) => {
+      console.log('signInOauthPost');
+      const code = req.query.code;
+      console.log(code);
+      const response = await axios.post(`https://github.com/login/oauth/access_token`, {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code
+      });
+    }
+  )
   .use('/event', eventsRouter)
   .use('/enrollments', enrollmentsRouter)
   .use('/tickets', ticketsRouter)
