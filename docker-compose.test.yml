@@ -14,12 +14,12 @@ services:
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-test:
-    image: redis:7-alpine
+    image: redis:7
     container_name: drivent-redis-test
     restart: always
     ports:
-      - 6379:6379
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server --port ${REDIS_PORT}
     volumes:
       - drivent-redis-data:/data
 
@@ -29,8 +29,10 @@ services:
       dockerfile: Dockerfile.test
     container_name: drivent-test
     depends_on:
-      - drivent-postgres-test
-      - drivent-redis-test
+      drivent-redis-test:
+        condition: service started
+      drivent-postgres-test:
+        condition: service started
     logging:
       driver: 'json-file'
       options:
@@ -38,6 +40,7 @@ services:
         max-file: '5'
     working_dir: /usr/src/drivent
     command: bash -c "npm run test:migration:run && npm test"
+    restart: always
     environment:
       NODE_ENV: test
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}

@@ -19,9 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Activate redis-server
-        run: sudo service redis-server start
-
       - name: Build
         run: npm run ci:build
 

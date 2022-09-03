@@ -14,12 +14,12 @@ services:
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-development:
-    image: redis:7-alpine
+    image: redis:7
     container_name: drivent-redis-development
     restart: always
     ports:
-      - 6379:6379
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server --port ${REDIS_PORT}
     volumes:
       - drivent-redis-data:/data
 
@@ -29,8 +29,10 @@ services:
       dockerfile: Dockerfile.development
     container_name: drivent-development
     depends_on:
-      - drivent-postgres-development
-      - drivent-redis-development
+      drivent-redis-development:
+        condition: service started
+      drivent-postgres-development:
+        condition: service started
     logging:
       driver: 'json-file'
       options:
@@ -38,6 +40,7 @@ services:
         max-file: '5'
     working_dir: /usr/src/drivent
     command: bash -c "npx prisma generate && npm run dev"
+    restart: always
     environment:
       NODE_ENV: development
     volumes:
