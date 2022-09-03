@@ -18,7 +18,7 @@ services:
     container_name: drivent-redis-development
     restart: always
     ports:
-      - 6379:6379
+      - 6381:6381
     command: redis-server
     volumes:
       - drivent-redis-data:/data
