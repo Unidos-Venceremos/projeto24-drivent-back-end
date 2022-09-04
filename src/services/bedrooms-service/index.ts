@@ -9,7 +9,8 @@ async function getAvailableBedrooms(): Promise<Bedroom[]> {
     return JSON.parse(cache);
   } else {
     const data = await getBedrooms();
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+    redis.set(cacheKey, JSON.stringify(data));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
     return data;
   }
 }

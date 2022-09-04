@@ -29,7 +29,8 @@ async function validateUniqueEmailOrFail(email: string) {
     if (userWithSameEmail) {
       throw duplicatedEmailError();
     } else {
-      redis.setEx(cacheKey, EXPIRATION, JSON.stringify(true));
+      redis.set(cacheKey, JSON.stringify(true));
+      // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(true));
     }
   }
 }

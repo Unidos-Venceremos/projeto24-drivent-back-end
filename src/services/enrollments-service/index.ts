@@ -32,7 +32,8 @@ async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddr
       ...(!!address && { address }),
     };
 
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+    redis.set(cacheKey, JSON.stringify(data));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
 
     return data;
   }

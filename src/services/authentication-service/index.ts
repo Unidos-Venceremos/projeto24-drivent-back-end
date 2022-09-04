@@ -32,7 +32,8 @@ async function getUserOrFail(email: string): Promise<GetUserOrFailResult> {
   } else {
     const user = await userRepository.findByEmail(email, { id: true, email: true, password: true });
     if (!user) throw invalidCredentialsError();
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(user));
+    redis.set(cacheKey, JSON.stringify(user));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(user));
 
     return user;
   }

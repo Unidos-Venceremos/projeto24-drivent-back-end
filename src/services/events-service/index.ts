@@ -16,7 +16,8 @@ async function getFirstEvent(): Promise<GetFirstEventResult> {
     if (!event) throw notFoundError();
 
     const data = exclude(event, 'createdAt', 'updatedAt');
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+    redis.set(cacheKey, JSON.stringify(data));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
     return data;
   }
 }
@@ -39,7 +40,8 @@ async function isCurrentEventActive(): Promise<boolean> {
     const eventEndsAt = dayjs(event.endsAt);
 
     const data = now.isAfter(eventStartsAt) && now.isBefore(eventEndsAt);
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+    redis.set(cacheKey, JSON.stringify(data));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
     return data;
   }
 }

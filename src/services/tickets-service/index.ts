@@ -9,7 +9,8 @@ async function getAvailableTickets(): Promise<GetAvailabeTicketsParams[]> {
     return cacheData;
   } else {
     const data = await ticketsRepository.getAvailabeTickets();
-    redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
+    redis.set(cacheKey, JSON.stringify(data));
+    // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
     return data;
   }
 }
