@@ -11,6 +11,7 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - ~/data/drivent/postgres-test:/var/lib/postgresql/data
+      - drivent-redis-data:/data
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-test:
@@ -19,7 +20,7 @@ services:
     restart: always
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
-    command: redis-server --port ${REDIS_PORT}
+    command: redis-server
     volumes:
       - drivent-redis-data:/data
 
@@ -40,7 +41,6 @@ services:
         max-file: '5'
     working_dir: /usr/src/drivent
     command: bash -c "npm run test:migration:run && npm test"
-    restart: always
     environment:
       NODE_ENV: test
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
@@ -50,9 +50,9 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
 
 volumes:
   drivent-redis-data:

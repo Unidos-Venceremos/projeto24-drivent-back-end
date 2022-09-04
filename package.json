@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "redis:start": "redis-server start",
     "prebuild": "rm -rf dist",
     "build": "ttsc -p tsconfig.build.json",
     "prepare": "husky install",

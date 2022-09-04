@@ -1,5 +1,7 @@
-import { createClient, RedisClientType } from 'redis';
+import { createClient } from 'redis';
 
-export const redis = createClient();
+export const redis = createClient({
+  url: process.env.REDIS_URL,
+});
 
 export const EXPIRATION = 30;

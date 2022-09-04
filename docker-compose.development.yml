@@ -11,6 +11,7 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - drivent-postgres-data:/var/lib/postgresql/data
+      - drivent-redis-data:/data
     command: postgres -p ${POSTGRES_PORT}
 
   drivent-redis-development:
@@ -19,7 +20,7 @@ services:
     restart: always
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
-    command: redis-server --port ${REDIS_PORT}
+    command: redis-server
     volumes:
       - drivent-redis-data:/data
 
@@ -43,6 +44,9 @@ services:
     restart: always
     environment:
       NODE_ENV: development
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
     volumes:
       - ./src:/usr/src/drivent/src
       - ./prisma:/usr/src/drivent/prisma
