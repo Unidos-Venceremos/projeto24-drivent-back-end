@@ -11,14 +11,29 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - ~/data/drivent/postgres-test:/var/lib/postgresql/data
+      - drivent-redis-data:/data
     command: postgres -p ${POSTGRES_PORT}
+
+  drivent-redis-test:
+    image: redis:7
+    container_name: drivent-redis-test
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server
+    volumes:
+      - drivent-redis-data:/data
+
   drivent-test:
     build:
       context: .
       dockerfile: Dockerfile.test
     container_name: drivent-test
     depends_on:
-      - drivent-postgres-test
+      drivent-redis-test:
+        condition: service_started
+      drivent-postgres-test:
+        condition: service_started
     logging:
       driver: 'json-file'
       options:
@@ -35,3 +50,9 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
+
+volumes:
+  drivent-redis-data:

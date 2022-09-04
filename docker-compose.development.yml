@@ -11,14 +11,29 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - drivent-postgres-data:/var/lib/postgresql/data
+      - drivent-redis-data:/data
     command: postgres -p ${POSTGRES_PORT}
+
+  drivent-redis-development:
+    image: redis:7
+    container_name: drivent-redis-development
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server
+    volumes:
+      - drivent-redis-data:/data
+
   drivent-development:
     build:
       context: .
       dockerfile: Dockerfile.development
     container_name: drivent-development
     depends_on:
-      - drivent-postgres-development
+      drivent-redis-development:
+        condition: service_started
+      drivent-postgres-development:
+        condition: service_started
     logging:
       driver: 'json-file'
       options:
@@ -26,8 +41,12 @@ services:
         max-file: '5'
     working_dir: /usr/src/drivent
     command: bash -c "npx prisma generate && npm run dev"
+    restart: always
     environment:
       NODE_ENV: development
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
     volumes:
       - ./src:/usr/src/drivent/src
       - ./prisma:/usr/src/drivent/prisma
@@ -38,5 +57,7 @@ services:
       - ./tsconfig.json:/usr/src/drivent/tsconfig.json
     ports:
       - 4000:4000
+
 volumes:
   drivent-postgres-data:
+  drivent-redis-data:

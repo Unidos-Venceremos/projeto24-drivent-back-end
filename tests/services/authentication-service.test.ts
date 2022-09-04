@@ -1,5 +1,5 @@
 import { init } from '@/app';
-import { prisma } from '@/config';
+import { prisma, redis } from '@/config';
 import authenticationService, { invalidCredentialsError } from '@/services/authentication-service';
 import faker from '@faker-js/faker';
 import { createUser } from '../factories';
@@ -8,6 +8,10 @@ import { cleanDb } from '../helpers';
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+beforeEach(async () => {
+  redis.flushAll();
 });
 
 describe('signIn', () => {
