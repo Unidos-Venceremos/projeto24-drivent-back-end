@@ -27,6 +27,7 @@ services:
   #   command: redis-server
   #   volumes:
   #     - drivent-redis-data:/data
+  #
 
   drivent-postgres-production:
     image: postgres:13-alpine
