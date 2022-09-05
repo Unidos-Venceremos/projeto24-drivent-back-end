@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'express-async-errors';
 import express, { Express } from 'express';
 import cors from 'cors';
+import axios from 'axios';
 
 import { loadEnv, connectDb, disconnectDB, redis } from '@/config';
 
@@ -15,6 +16,7 @@ import {
   enrollmentsRouter,
   ticketsRouter,
   bedroomsRouter,
+  oauthRouter,
   paymentsRouter,
   hotelsRouter,
 } from '@/routers';
@@ -26,6 +28,7 @@ app
   .get('/health', (_req, res) => res.send('OK!'))
   .use('/users', usersRouter)
   .use('/auth', authenticationRouter)
+  .use('/oauth', oauthRouter)
   .use('/event', eventsRouter)
   .use('/enrollments', enrollmentsRouter)
   .use('/tickets', ticketsRouter)
