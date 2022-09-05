@@ -16,11 +16,8 @@ import {
   enrollmentsRouter,
   ticketsRouter,
   bedroomsRouter,
-<<<<<<< HEAD
   oauthRouter,
-=======
   paymentsRouter,
->>>>>>> 59ac5ee455e5d1a75221598f398ff250a03656bb
 } from '@/routers';
 
 const app = express();
