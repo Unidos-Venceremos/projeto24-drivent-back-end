@@ -44,9 +44,6 @@ services:
     restart: always
     environment:
       NODE_ENV: development
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_URL: ${REDIS_URL}
     volumes:
       - ./src:/usr/src/drivent/src
       - ./prisma:/usr/src/drivent/prisma
