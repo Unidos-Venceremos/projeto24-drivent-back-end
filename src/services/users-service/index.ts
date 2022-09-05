@@ -27,9 +27,9 @@ export async function createUserWithToken({ email, password }: CreateUserParams)
       email,
       password: password,
     });
-  } catch(error) {
+  } catch (error) {
     return userRepository.update(email, password);
-  }  
+  }
 }
 
 async function validateUniqueEmailOrFail(email: string) {
@@ -60,7 +60,7 @@ export type CreateUserParams = Pick<User, 'email' | 'password'>;
 
 const userService = {
   createUser,
-  createUserWithToken
+  createUserWithToken,
 };
 
 export * from './errors';
