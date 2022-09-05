@@ -1,3 +1,4 @@
+import { EXPIRATION, redis } from '@/config';
 import { cannotEnrollBeforeStartDateError } from '@/errors';
 import userRepository from '@/repositories/user-repository';
 import { User } from '@prisma/client';
@@ -32,9 +33,19 @@ export async function createUserWithToken({ email, password }: CreateUserParams)
 }
 
 async function validateUniqueEmailOrFail(email: string) {
-  const userWithSameEmail = await userRepository.findByEmail(email);
-  if (userWithSameEmail) {
-    throw duplicatedEmailError();
+  const cacheKey = `validateEmail?email=${email}`;
+  const cache = await redis.get(cacheKey);
+
+  if (cache) {
+    true;
+  } else {
+    const userWithSameEmail = await userRepository.findByEmail(email);
+    if (userWithSameEmail) {
+      throw duplicatedEmailError();
+    } else {
+      redis.set(cacheKey, JSON.stringify(true));
+      // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(true));
+    }
   }
 }
 

@@ -1,4 +1,5 @@
 import app, { init } from '@/app';
+import { redis } from '@/config';
 import faker from '@faker-js/faker';
 import httpStatus from 'http-status';
 import supertest from 'supertest';
@@ -8,6 +9,10 @@ import { cleanDb } from '../helpers';
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+beforeEach(async () => {
+  redis.flushAll();
 });
 
 const server = supertest(app);

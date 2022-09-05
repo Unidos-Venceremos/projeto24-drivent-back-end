@@ -4,7 +4,7 @@ import express, { Express } from 'express';
 import cors from 'cors';
 import axios from 'axios';
 
-import { loadEnv, connectDb, disconnectDB } from '@/config';
+import { loadEnv, connectDb, disconnectDB, redis } from '@/config';
 
 loadEnv();
 
@@ -40,6 +40,7 @@ app
 
 export function init(): Promise<Express> {
   connectDb();
+  redis.connect();
   return Promise.resolve(app);
 }
 

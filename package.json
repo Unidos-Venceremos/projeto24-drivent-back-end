@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "redis:start": "redis-server start",
     "prebuild": "rm -rf dist",
     "build": "ttsc -p tsconfig.build.json",
     "prepare": "husky install",
@@ -12,7 +13,7 @@
     "migration:generate": "npm run dev:load-envs prisma migrate dev",
     "seed": "npx prisma db seed",
     "lint:staged": "lint-staged",
-    "test": "jest --passWithNoTests --runInBand",
+    "test": "jest --passWithNoTests --runInBand --forceExit --detectOpenHandles",
     "test:migration:run": "npm run test:load-envs prisma migrate deploy",
     "test:migration:generate": "npm run test:load-envs prisma migrate dev",
     "test:watch": "jest --watch --passWithNoTests --runInBand",
@@ -100,6 +101,7 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "query-string": "^7.1.1",
+    "redis": "^4.3.0",
     "reflect-metadata": "^0.1.13"
   }
 }

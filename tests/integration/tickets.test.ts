@@ -1,4 +1,5 @@
 import app, { init } from '@/app';
+import { redis } from '@/config';
 import faker from '@faker-js/faker';
 import httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
@@ -10,6 +11,10 @@ import { cleanDb, generateValidToken } from '../helpers';
 beforeAll(async () => {
   await init();
   await cleanDb();
+});
+
+beforeEach(async () => {
+  redis.flushAll();
 });
 
 const server = supertest(app);
@@ -49,7 +54,7 @@ describe('GET /tickets when token is valid', () => {
     expect(response.body).toStrictEqual([]);
   });
 
-  it('should respond with status 200 and array of empty Tickets', async () => {
+  it('should respond with status 200 and array of 2 Tickets', async () => {
     const tickets = await createAvailableTicket();
     const token = await generateValidToken();
 
