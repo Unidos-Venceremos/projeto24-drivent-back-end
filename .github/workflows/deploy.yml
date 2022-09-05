@@ -21,7 +21,7 @@ jobs:
           SECRETS: ${{ toJson(secrets) }}
 
       - name: Build
-        run: docker-compose build
+        run: docker-compose build --remove-orphans
 
       - name: Run
         run: docker-compose down && docker-compose up -d
