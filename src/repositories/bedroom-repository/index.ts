@@ -1,5 +1,6 @@
 import { prisma } from '@/config';
 import { Bedroom } from '@prisma/client';
+import { BedroomWithGuests } from '@/services/bedrooms-service';
 
 export type CreateBedroom = Omit<Bedroom, 'id'>;
 
@@ -8,5 +9,21 @@ export async function insertBedroom(bedroomData: CreateBedroom): Promise<Bedroom
 }
 
 export async function getBedrooms(): Promise<Bedroom[]> {
-  return prisma.bedroom.findMany({ where: { enrollmentId: null } });
+  return prisma.bedroom.findMany({ where: { available: true } });
+}
+
+export async function getBedroomsWithGuests(): Promise<BedroomWithGuests[]> {
+  return prisma.bedroom.findMany({ where: { available: true }, include: { guests: true } });
+}
+
+export async function getBedroomById(id: number): Promise<Bedroom> {
+  return prisma.bedroom.findUnique({ where: { id } });
+}
+
+export async function getBedroomsByHotelId(id: number): Promise<Bedroom[]> {
+  return prisma.bedroom.findMany({ where: { hotelId: id } });
+}
+
+export async function updateBedroom(id: number, bedroomData: CreateBedroom): Promise<Bedroom> {
+  return prisma.bedroom.update({ where: { id }, data: bedroomData });
 }

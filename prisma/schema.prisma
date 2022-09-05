@@ -20,6 +20,8 @@ model User {
   Enrollment Enrollment[]
   Ticket     Ticket[]
   Payment    Payment[]
+  bedroomId  Int?
+  Bedroom    Bedroom?     @relation(fields: [bedroomId], references: [id])
 }
 
 model Session {
@@ -49,10 +51,11 @@ model Enrollment {
   birthday  DateTime
   phone     String    @db.VarChar(255)
   userId    Int       @unique
-  User      User      @relation(fields: [userId], references: [id])
   Address   Address[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
 }
 
 model Address {
@@ -81,6 +84,7 @@ model Ticket {
 model Hotel {
   id                  Int       @id @default(autoincrement())
   name                String    @unique
+  backgroundImageUrl  String    @db.VarChar(255)
   singleAccommodation Boolean   @default(true)
   doubleAccommodation Boolean   @default(true)
   tripleAccommodation Boolean   @default(true)
@@ -90,12 +94,14 @@ model Hotel {
 }
 
 model Bedroom {
-  id           Int       @id @default(autoincrement())
-  hotelId      Int
-  enrollmentId Int?      @unique
-  typeRoom     typesRoom
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  number    Int
+  hotelId   Int
+  typeRoom  typesRoom
+  guests    User[]
+  available Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   Hotel Hotel @relation(fields: [hotelId], references: [id])
 }
@@ -116,7 +122,7 @@ model Payment {
   expiry    String   @db.VarChar(255)
   ticketId  Int
   Ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  withHotel Boolean 
+  withHotel Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
