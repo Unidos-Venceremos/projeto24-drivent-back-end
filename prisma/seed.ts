@@ -34,24 +34,26 @@ async function main() {
 
   const pallaceHotel = {
     name: 'Pallace Hotel',
+    backgroundImageUrl:
+      'https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1332&q=80',
   };
   const hotelCreated = await prisma.hotel.upsert({
     where: { name: pallaceHotel.name },
     update: pallaceHotel,
     create: pallaceHotel,
-  })
+  });
 
   await prisma.bedroom.createMany({
     data: [
-      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'SINGLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'DOUBLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
-      { hotelId: hotelCreated.id, typeRoom: 'TRIPLE' },
+      { hotelId: hotelCreated.id, number: 1, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, number: 2, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, number: 3, typeRoom: 'SINGLE' },
+      { hotelId: hotelCreated.id, number: 4, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, number: 5, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, number: 6, typeRoom: 'DOUBLE' },
+      { hotelId: hotelCreated.id, number: 7, typeRoom: 'TRIPLE' },
+      { hotelId: hotelCreated.id, number: 8, typeRoom: 'TRIPLE' },
+      { hotelId: hotelCreated.id, number: 9, typeRoom: 'TRIPLE' },
     ],
     skipDuplicates: true,
   });
