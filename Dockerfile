@@ -7,7 +7,6 @@ COPY ./tsconfig*.json ./
 COPY ./prisma ./prisma
 COPY ./.husky ./
 RUN npm install
-CMD [ "sudo systemctl start redis-server" ]
 COPY . .
 RUN npm run build
 
