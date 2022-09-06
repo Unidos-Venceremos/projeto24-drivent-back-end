@@ -33,9 +33,9 @@ services:
       - /usr/local/drivent-pg/data:/var/lib/postgresql/data
     command: postgres -p ${POSTGRES_PORT}
 
-  drivent-redis-test:
+  drivent-redis-production:
     image: redis:7
-    container_name: drivent-redis-test
+    container_name: drivent-redis-production
     restart: always
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
