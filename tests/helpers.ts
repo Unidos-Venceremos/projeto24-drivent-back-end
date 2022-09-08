@@ -26,3 +26,12 @@ export async function generateValidToken(user?: User) {
 
   return token;
 }
+
+export async function generateValidTokenAndUser(user?: User) {
+  const incomingUser = user || (await createUser());
+  const token = jwt.sign({ userId: incomingUser.id }, process.env.JWT_SECRET);
+
+  await createSession(token);
+
+  return [incomingUser?.id, token];
+}

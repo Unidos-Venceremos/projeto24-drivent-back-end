@@ -54,9 +54,9 @@ async function attachBedroomIdToUser(userId: number, bedroomId: number) {
 
 const userRepository = {
   findByEmail,
+  findUserById,
   create,
   update,
-  findUserById,
   attachBedroomIdToUser,
 };
 
