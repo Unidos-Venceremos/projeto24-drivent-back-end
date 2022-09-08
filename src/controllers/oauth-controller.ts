@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import qs from 'query-string';
-import userRepository from '@/repositories/user-repository';
 import sessionRepository from '@/repositories/session-repository';
 import userService from '@/services/users-service';
 import httpStatus from 'http-status';
@@ -10,11 +9,17 @@ import httpStatus from 'http-status';
 export async function signInOauthPost(req: Request, res: Response) {
   const code = req.body.code;
   const token = await exchangeCodeForAccessToken(req.body.code);
-  const userEmail = await fetchUserEmail(token);
+  const email = await fetchUserEmail(token);
+  const password = await fetchUserDataForCreatePassword(token);
 
   const user = await userService.createUserWithToken({ 
-    email: userEmail, 
-    password: token.toString() 
+    email, 
+    password, 
+  });
+
+  const session = await sessionRepository.upsert({
+    token: token.toString(),
+    userId: user.id,
   });
     
   res.status(httpStatus.CREATED).send({
@@ -53,6 +58,15 @@ async function fetchUserEmail(token: any) {
       Authorization: `Bearer ${token}`,
     },
   });
-    
+  
   return response.data[0].email;
+}
+
+async function fetchUserDataForCreatePassword(token: any) {
+  const response = await axios.get("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data.node_id;
 }
