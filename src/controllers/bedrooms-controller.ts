@@ -16,3 +16,14 @@ export async function getBedroomByHotelId(req: AuthenticatedRequest, res: Respon
 
   return res.status(httpStatus.OK).send(bedrooms);
 }
+
+export async function registerBedroom(req: AuthenticatedRequest, res: Response) {
+  const { hotelId, bedroomId } = req.params;
+  const intHotelId = parseInt(hotelId);
+  const intBedroomId = parseInt(bedroomId);
+  const userId = req.userId;
+
+  await bedroomService.registerBedroom(intHotelId, intBedroomId, userId);
+
+  return res.status(httpStatus.OK).send({ hotelId: intHotelId, bedroomId: intBedroomId });
+}
