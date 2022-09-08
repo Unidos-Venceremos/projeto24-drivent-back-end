@@ -25,7 +25,7 @@ export async function createUserWithToken({ email, password }: CreateUserParams)
     await validateUniqueEmailOrFail(email);
     return userRepository.create({
       email,
-      password: password,
+      password,
     });
   } catch (error) {
     return userRepository.update(email, password);
