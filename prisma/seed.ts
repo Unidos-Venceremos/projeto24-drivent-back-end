@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import dayjs from 'dayjs';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -57,6 +58,101 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+  const localsData = [{ name: 'Auditório Principal' }, { name: 'Auditório Secundário' }, { name: 'Sala de Workshop' }];
+
+  const locals = await prisma.local.createMany({
+    data: localsData,
+    skipDuplicates: true,
+  });
+
+  let localsRecords;
+
+  if (locals.count === 3) {
+    localsRecords = await prisma.local.findMany({});
+  }
+
+  if (localsRecords[0].id && localsRecords[1].id && localsRecords[2].id) {
+    const activitiesData = [
+      {
+        title: 'Minecraft: montando o PC ideal',
+        localId: localsRecords[0].id,
+        startsAt: dayjs('2022-10-22 09:00').toDate(),
+        endsAt: dayjs('2022-10-22 10:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 27,
+      },
+      {
+        title: 'LoL: montando o PC ideal',
+        localId: localsRecords[0].id,
+        startsAt: dayjs('2022-10-22 10:00').toDate(),
+        endsAt: dayjs('2022-10-22 11:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 0,
+      },
+      {
+        title: 'Palestra x',
+        localId: localsRecords[1].id,
+        startsAt: dayjs('2022-10-22 09:00').toDate(),
+        endsAt: dayjs('2022-10-22 11:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 27,
+      },
+      {
+        title: 'Palestra y',
+        localId: localsRecords[2].id,
+        startsAt: dayjs('2022-10-22 09:00').toDate(),
+        endsAt: dayjs('2022-10-22 10:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 27,
+      },
+      {
+        title: 'Palestra z',
+        localId: localsRecords[2].id,
+        startsAt: dayjs('2022-10-22 10:00').toDate(),
+        endsAt: dayjs('2022-10-22 11:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 0,
+      },
+      {
+        title: 'Palestra y',
+        localId: localsRecords[0].id,
+        startsAt: dayjs('2022-10-23 10:00').toDate(),
+        endsAt: dayjs('2022-10-23 12:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 23,
+      },
+      {
+        title: 'Palestra z',
+        localId: localsRecords[1].id,
+        startsAt: dayjs('2022-10-23 09:00').toDate(),
+        endsAt: dayjs('2022-10-23 11:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 20,
+      },
+      {
+        title: 'Palestra y',
+        localId: localsRecords[0].id,
+        startsAt: dayjs('2022-10-24 10:00').toDate(),
+        endsAt: dayjs('2022-10-24 12:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 23,
+      },
+      {
+        title: 'Palestra z',
+        localId: localsRecords[1].id,
+        startsAt: dayjs('2022-10-24 09:00').toDate(),
+        endsAt: dayjs('2022-10-24 11:00').toDate(),
+        totalVacancies: 27,
+        currentVacancies: 20,
+      },
+    ];
+
+    await prisma.activity.createMany({
+      data: activitiesData,
+      skipDuplicates: true,
+    });
+  }
 
   console.log({ event });
   console.log({ ticketsPresential });

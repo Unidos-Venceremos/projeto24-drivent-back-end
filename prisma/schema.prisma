@@ -11,17 +11,18 @@ datasource db {
 }
 
 model User {
-  id         Int          @id @default(autoincrement())
-  email      String       @unique @db.VarChar(255)
-  password   String       @db.VarChar(255)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id         Int            @id @default(autoincrement())
+  email      String         @unique @db.VarChar(255)
+  password   String         @db.VarChar(255)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   Session    Session[]
   Enrollment Enrollment[]
   Ticket     Ticket[]
   Payment    Payment[]
   bedroomId  Int?
-  Bedroom    Bedroom?     @relation(fields: [bedroomId], references: [id])
+  Bedroom    Bedroom?       @relation(fields: [bedroomId], references: [id])
+  Activities ActivityUser[]
 }
 
 model Session {
@@ -125,4 +126,41 @@ model Payment {
   withHotel Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Local {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(255)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Activity  Activity[]
+}
+
+model Activity {
+  id               Int            @id @default(autoincrement())
+  title            String         @db.VarChar(255)
+  localId          Int
+  startsAt         DateTime
+  endsAt           DateTime
+  totalVacancies   Int
+  currentVacancies Int
+  participants     ActivityUser[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  Local Local @relation(fields: [localId], references: [id])
+
+  @@unique([localId, startsAt, endsAt])
+  @@index([startsAt])
+}
+
+model ActivityUser {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  activityId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  User     User     @relation(fields: [userId], references: [id])
+  Activity Activity @relation(fields: [activityId], references: [id])
 }

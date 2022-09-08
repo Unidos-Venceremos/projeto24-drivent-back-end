@@ -35,7 +35,7 @@ async function update(userEmail: string, newPassword: string) {
 const userRepository = {
   findByEmail,
   create,
-  update
+  update,
 };
 
 export default userRepository;
