@@ -32,10 +32,32 @@ async function update(userEmail: string, newPassword: string) {
   });
 }
 
+async function findUserById(id: number) {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      Bedroom: true,
+    },
+  });
+}
+
+async function attachBedroomIdToUser(userId: number, bedroomId: number) {
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      bedroomId,
+    },
+  });
+}
+
 const userRepository = {
   findByEmail,
   create,
-  update
+  update,
+  findUserById,
+  attachBedroomIdToUser,
 };
 
 export default userRepository;
