@@ -20,3 +20,10 @@ export function notAvailableBedroomError(): ApplicationError {
     message: 'This bedroom is not available!',
   };
 }
+
+export function repeatedBedroom(): ApplicationError {
+  return {
+    name: 'ConflictError',
+    message: 'The user bedroom is the same you are trying to register!',
+  };
+}
