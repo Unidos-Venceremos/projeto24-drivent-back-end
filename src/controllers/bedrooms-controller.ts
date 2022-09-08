@@ -18,12 +18,11 @@ export async function getBedroomByHotelId(req: AuthenticatedRequest, res: Respon
 }
 
 export async function registerBedroom(req: AuthenticatedRequest, res: Response) {
-  const { hotelId, bedroomId } = req.params;
-  const intHotelId = parseInt(hotelId);
+  const { bedroomId } = req.params;
   const intBedroomId = parseInt(bedroomId);
   const userId = req.userId;
 
-  await bedroomService.registerBedroom(intHotelId, intBedroomId, userId);
+  await bedroomService.registerBedroom(intBedroomId, userId);
 
-  return res.status(httpStatus.OK).send({ hotelId: intHotelId, bedroomId: intBedroomId });
+  return res.status(httpStatus.OK).send({ bedroomId: intBedroomId });
 }

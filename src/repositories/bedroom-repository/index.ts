@@ -36,3 +36,7 @@ export async function updateBedroom(id: number, bedroomData: CreateBedroom): Pro
 export async function unavailableBedroom(id: number): Promise<BedroomWithGuests> {
   return prisma.bedroom.update({ where: { id }, data: { available: false }, include: { guests: true } });
 }
+
+export async function availableBedroom(id: number): Promise<BedroomWithGuests> {
+  return prisma.bedroom.update({ where: { id }, data: { available: true }, include: { guests: true } });
+}

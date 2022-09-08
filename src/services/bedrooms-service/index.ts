@@ -1,10 +1,10 @@
 import { redis, EXPIRATION } from '@/config';
-import { getBedroomById, getBedrooms, getBedroomsWithGuests, unavailableBedroom } from '@/repositories/bedroom-repository';
+import { availableBedroom, getBedroomById, getBedrooms, getBedroomsWithGuests, unavailableBedroom } from '@/repositories/bedroom-repository';
 import { getHotelById } from '@/repositories/hotel-repository';
 import { Bedroom, User } from '@prisma/client';
 import { notFoundHotelError } from '@/errors/not-found-hotel';
 import { invalidIdError } from '@/errors/invalid-info';
-import { bedroomDoesntMatchWithHotelError, notAvailableBedroomError, notFoundBedroomError } from '@/errors/not-found-bedroom';
+import { bedroomDoesntMatchWithHotelError, notAvailableBedroomError, notFoundBedroomError, repeatedBedroom } from '@/errors/not-found-bedroom';
 import userRepository from '@/repositories/user-repository';
 
 export type BedroomWithGuests = Bedroom & { guests: User[] };
@@ -68,40 +68,34 @@ async function getBedroomByHotelId(id: number): Promise<BedroomInfo[]> {
   return bedroomsFormatted;
 }
 
-async function registerBedroom(hotelId: number, bedroomId: number, userId: number) {
-  if (!hotelId) {
-    throw invalidIdError(hotelId);
-  }
+async function registerBedroom(bedroomId: number, userId: number) {
+  const userFind = await userRepository.findUserById(userId);
+
   if (!bedroomId) {
     throw invalidIdError(bedroomId);
-  }
-
-  const hotelExists = await getHotelById(hotelId);
-  if (!hotelExists) {
-    throw notFoundHotelError();
   }
 
   const bedroomExists = await getBedroomById(bedroomId);
   if (!bedroomExists) {
     throw notFoundBedroomError();
   }
-  if (bedroomExists.hotelId !== hotelId) {
-    throw bedroomDoesntMatchWithHotelError();
-  }
   if (!bedroomExists.available) {
     throw notAvailableBedroomError();
   }
 
-  const user = await userRepository.findUserById(userId);
-  if (user.bedroomId === bedroomId) {
-    // console.log(user);
+  if (userFind.bedroomId === bedroomId) {
+    // console.log(userFind);
     // console.log(bedroomExists);
     console.log('Mesmo quarto');
-    return;
+    throw repeatedBedroom();
+  }
+
+  if (userFind.bedroomId) {
+    await availableBedroom(userFind.bedroomId);
   }
 
   await userRepository.attachBedroomIdToUser(userId, bedroomId);
-  // console.log(user);
+  // console.log(userFind);
   // console.log(bedroomExists);
   console.log('Quarto novo');
 
