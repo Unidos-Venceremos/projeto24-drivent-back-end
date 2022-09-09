@@ -55,9 +55,26 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
 
   try {
     await prisma.$transaction(async (prisma) => {
-      const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
+      const newEnrollment = await prisma.enrollment.upsert({
+        where: {
+          userId: params.userId,
+        },
+        create: enrollment,
+        update: exclude(enrollment, 'userId'),
+      });
+      // const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
 
-      await addressRepository.upsert(newEnrollment.id, address, address);
+      await prisma.address.upsert({
+        where: {
+          enrollmentId: newEnrollment.id,
+        },
+        create: {
+          ...address,
+          Enrollment: { connect: { id: newEnrollment.id } },
+        },
+        update: address,
+      });
+      // await addressRepository.upsert(newEnrollment.id, address, address);
     });
   } catch (error) {
     throw invalidDataErrorGeneric();

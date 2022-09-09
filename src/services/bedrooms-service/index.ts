@@ -94,10 +94,24 @@ async function registerBedroom(bedroomId: number, userId: number) {
   try {
     await prisma.$transaction(async (prisma) => {
       if (userFind.bedroomId) {
-        await availableBedroom(userFind.bedroomId);
+        await prisma.bedroom.update({
+          where: { id: userFind.bedroomId },
+          data: { available: true },
+          include: { guests: true },
+        });
+        // await availableBedroom(userFind.bedroomId);
       }
 
-      await userRepository.attachBedroomIdToUser(userId, bedroomId);
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          bedroomId,
+        },
+      });
+      // await userRepository.attachBedroomIdToUser(userId, bedroomId);
+
       // console.log(userFind);
       // console.log(bedroomExists);
       console.log('Quarto novo');
@@ -108,7 +122,13 @@ async function registerBedroom(bedroomId: number, userId: number) {
         (actualizedBedroom.guests.length === 2 && actualizedBedroom.typeRoom === 'DOUBLE') ||
         (actualizedBedroom.guests.length === 3 && actualizedBedroom.typeRoom === 'TRIPLE')
       ) {
-        await unavailableBedroom(bedroomId);
+        await prisma.bedroom.update({
+          where: { id: bedroomId },
+          data: { available: false },
+          include: { guests: true },
+        });
+        // await unavailableBedroom(bedroomId);
+
         // const lockedBedroom = await unavailableBedroom(bedroomId);
         // console.log(lockedBedroom);
       }
