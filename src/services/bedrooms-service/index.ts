@@ -1,4 +1,4 @@
-import { redis, EXPIRATION } from '@/config';
+import { redis, EXPIRATION, prisma } from '@/config';
 import { availableBedroom, getBedroomById, getBedrooms, getBedroomsWithGuests, unavailableBedroom } from '@/repositories/bedroom-repository';
 import { getHotelById } from '@/repositories/hotel-repository';
 import { Bedroom, User } from '@prisma/client';
@@ -6,6 +6,7 @@ import { notFoundHotelError } from '@/errors/not-found-hotel';
 import { invalidIdError } from '@/errors/invalid-info';
 import { bedroomDoesntMatchWithHotelError, notAvailableBedroomError, notFoundBedroomError, repeatedBedroom } from '@/errors/not-found-bedroom';
 import userRepository from '@/repositories/user-repository';
+import { invalidDataErrorGeneric } from '@/errors';
 
 export type BedroomWithGuests = Bedroom & { guests: User[] };
 
@@ -90,26 +91,52 @@ async function registerBedroom(bedroomId: number, userId: number) {
     throw repeatedBedroom();
   }
 
-  if (userFind.bedroomId) {
-    await availableBedroom(userFind.bedroomId);
-  }
+  try {
+    await prisma.$transaction(async (prisma) => {
+      if (userFind.bedroomId) {
+        await prisma.bedroom.update({
+          where: { id: userFind.bedroomId },
+          data: { available: true },
+          include: { guests: true },
+        });
+        // await availableBedroom(userFind.bedroomId);
+      }
 
-  await userRepository.attachBedroomIdToUser(userId, bedroomId);
-  // console.log(userFind);
-  // console.log(bedroomExists);
-  console.log('Quarto novo');
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          bedroomId,
+        },
+      });
+      // await userRepository.attachBedroomIdToUser(userId, bedroomId);
 
-  const actualizedBedroom = await getBedroomById(bedroomId);
-  if (
-    (actualizedBedroom.guests.length === 1 && actualizedBedroom.typeRoom === 'SINGLE') ||
-    (actualizedBedroom.guests.length === 2 && actualizedBedroom.typeRoom === 'DOUBLE') ||
-    (actualizedBedroom.guests.length === 3 && actualizedBedroom.typeRoom === 'TRIPLE')
-  ) {
-    await unavailableBedroom(bedroomId);
-    // const lockedBedroom = await unavailableBedroom(bedroomId);
-    // console.log(lockedBedroom);
+      // console.log(userFind);
+      // console.log(bedroomExists);
+      console.log('Quarto novo');
+
+      const actualizedBedroom = await getBedroomById(bedroomId);
+      if (
+        (actualizedBedroom.guests.length === 1 && actualizedBedroom.typeRoom === 'SINGLE') ||
+        (actualizedBedroom.guests.length === 2 && actualizedBedroom.typeRoom === 'DOUBLE') ||
+        (actualizedBedroom.guests.length === 3 && actualizedBedroom.typeRoom === 'TRIPLE')
+      ) {
+        await prisma.bedroom.update({
+          where: { id: bedroomId },
+          data: { available: false },
+          include: { guests: true },
+        });
+        // await unavailableBedroom(bedroomId);
+
+        // const lockedBedroom = await unavailableBedroom(bedroomId);
+        // console.log(lockedBedroom);
+      }
+      // console.log(actualizedBedroom);
+    });
+  } catch (error) {
+    throw invalidDataErrorGeneric();
   }
-  // console.log(actualizedBedroom);
 
   const cacheKey = 'bedrooms';
   redis.del(cacheKey);

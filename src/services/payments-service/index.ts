@@ -1,7 +1,8 @@
 import Cryptr from 'cryptr';
 import * as paymentsRepository from '@/repositories/payments-repository';
 import ticketsRepository from '@/repositories/tickets-repository';
-import { cannotOnlineWithHotelError } from '@/errors';
+import { cannotOnlineWithHotelError, invalidDataErrorGeneric } from '@/errors';
+import { prisma } from '@/config';
 
 interface payment {
   userId: number;
@@ -21,11 +22,21 @@ export async function registerPayment(payment: payment) {
   const ticket = await ticketsRepository.getFirstTicket(presential);
   const cvvHash = encrypt(cvv);
 
-  await ticketsRepository.updateTicket(ticket.id, userId);
+  try {
+    await prisma.$transaction(async (prisma) => {
+      await prisma.ticket.update({ where: { id: ticket.id }, data: { userId } });
+      // await ticketsRepository.updateTicket(ticket.id, userId);
 
-  const data = { userId, holder, expiry, cvv: cvvHash, number, withHotel, ticketId: ticket.id };
+      const data = { userId, holder, expiry, cvv: cvvHash, number, withHotel, ticketId: ticket.id };
 
-  return await paymentsRepository.registerPayment(data);
+      return await prisma.payment.create({
+        data,
+      });
+      // return await paymentsRepository.registerPayment(data);
+    });
+  } catch (error) {
+    throw invalidDataErrorGeneric();
+  }
 }
 
 function encrypt(cvv: string) {
