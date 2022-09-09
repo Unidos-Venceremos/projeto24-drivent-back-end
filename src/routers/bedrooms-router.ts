@@ -8,6 +8,6 @@ bedroomsRouter
   .all('/*', authenticateToken)
   .get('/', getAllAvailableBedrooms)
   .get('/hotels/:hotelId', getBedroomByHotelId)
-  .post('/:bedroomId', registerBedroom);
+  .post('/:hotelId/:bedroomId', registerBedroom);
 
 export { bedroomsRouter };

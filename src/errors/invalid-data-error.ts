@@ -8,6 +8,13 @@ export function invalidDataError(details: string[]): ApplicationInvalidateDataEr
   };
 }
 
+export function invalidDataErrorGeneric(): ApplicationError {
+  return {
+    name: 'InvalidDataError',
+    message: 'Invalid data',
+  };
+}
+
 type ApplicationInvalidateDataError = ApplicationError & {
   details: string[];
 };

@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import supertest from 'supertest';
 
 import { createUser } from '../factories';
-import { createActivitiesInfo } from '../factories/activities-factory';
+import { createActivitiesInfo, createActivitiesByDate } from '../factories/activities-factory';
 import { createAvailableTicketPresentialByUserId } from '../factories/tickets-factory';
 import { cleanDb, generateValidTokenAndUser } from '../helpers';
 
@@ -42,7 +42,7 @@ describe('GET /activities when token is invalid', () => {
 });
 
 describe('GET /activities when token is valid', () => {
-  it('should respond with status 200 and return an array of rooms', async () => {
+  it('should respond with status 200 and return an array of activities', async () => {
     const [userId, token] = await generateValidTokenAndUser();
     await createAvailableTicketPresentialByUserId(+userId);
     const activitiesInfo = await createActivitiesInfo(+userId);
@@ -51,5 +51,21 @@ describe('GET /activities when token is valid', () => {
 
     expect(response.status).toBe(httpStatus.OK);
     expect(response.body).toStrictEqual(activitiesInfo);
+  });
+});
+
+describe('GET /activities/filter filter by  when token is valid', () => {
+  it('should respond with status 200 and return an array of activities per local by date', async () => {
+    const [userId, token] = await generateValidTokenAndUser();
+    await createAvailableTicketPresentialByUserId(+userId);
+    const date = '2022-10-22';
+    await createActivitiesByDate(+userId, date);
+
+    const response = await server
+      .get('/activities/filter/?activityDay=' + date)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.OK);
+    expect(response.body).not.toBe(null);
   });
 });
