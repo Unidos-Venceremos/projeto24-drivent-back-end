@@ -12,6 +12,10 @@ interface DaysData {
   [key: string]: string;
 }
 
+interface ActivitiesData {
+  [key: string]: Array<any>;
+}
+
 export async function createLocals() {
   const localsData = [{ name: 'Auditório Principal' }, { name: 'Auditório Secundário' }, { name: 'Sala de Workshop' }];
 
@@ -149,4 +153,40 @@ export async function createActivitiesInfo(userId: number) {
 
     return Object.keys(days);
   }
+}
+
+export async function createActivitiesByDate(userId: number, activityDay: string) {
+  const userTicket = await ticketsRepository.getTicketByUserId(userId);
+
+  if (!userTicket) {
+    throw notFoundUserTicketError();
+  }
+
+  if (!userTicket.presential) {
+    throw unauthorizedActivitiesError();
+  }
+
+  const eventsInit = dayjs(activityDay + ' 09:00').toDate();
+  const eventsEnd = dayjs(activityDay + ' 23:59').toDate();
+
+  const activities = await activityRepository.findAllByDate(eventsInit, eventsEnd);
+
+  const activitiesInLocals: ActivitiesData = {};
+
+  for (let index = 0; index < activities.length; index++) {
+    const activity = activities[index];
+    const local = activity.Local.name;
+
+    const duration = dayjs(activity.endsAt).diff(dayjs(activity.startsAt), 'hour');
+    const startsAtTimezone = dayjs(activity.startsAt).toDate().toString();
+    const endsAtTimezone = dayjs(activity.endsAt).toDate().toString();
+
+    if (!activitiesInLocals[local]) {
+      activitiesInLocals[local] = [{ ...activity, startsAt: startsAtTimezone, endsAt: endsAtTimezone, duration }];
+    } else {
+      activitiesInLocals[local].push({ ...activity, startsAt: startsAtTimezone, endsAt: endsAtTimezone, duration });
+    }
+  }
+
+  return activitiesInLocals;
 }
