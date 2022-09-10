@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Local, PrismaClient } from '@prisma/client';
 import dayjs from 'dayjs';
 
 const prisma = new PrismaClient();
@@ -66,10 +66,12 @@ async function main() {
     skipDuplicates: true,
   });
 
-  let localsRecords;
+  let localsRecords: Local[];
 
   if (locals.count === 3) {
     localsRecords = await prisma.local.findMany({});
+  } else {
+    localsRecords = [];
   }
 
   if (localsRecords[0].id && localsRecords[1].id && localsRecords[2].id) {
