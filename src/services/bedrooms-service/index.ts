@@ -152,10 +152,19 @@ async function registerBedroom(HotelId: number, bedroomId: number, userId: numbe
   redis.del(cacheKey);
 }
 
+function getBedroomsById(id: number, hotelId: number): Promise<BedroomWithGuests> {
+  const bedroom = getBedroomById(id, hotelId);
+  if (!bedroom) {
+    throw notFoundBedroomError();
+  }
+  return bedroom;
+}
+
 export const bedroomsService = {
   getAvailableBedrooms,
   getBedroomByHotelId,
   registerBedroom,
+  getBedroomsById,
 };
 
 export default bedroomsService;
