@@ -1,10 +1,10 @@
-import { redis, EXPIRATION, prisma } from '@/config';
-import { availableBedroom, getBedroomById, getBedrooms, getBedroomsWithGuests, unavailableBedroom } from '@/repositories/bedroom-repository';
+import { redis, prisma } from '@/config';
+import { getBedroomById, getBedrooms, getBedroomsWithGuests } from '@/repositories/bedroom-repository';
 import { getHotelById } from '@/repositories/hotel-repository';
 import { Bedroom, User } from '@prisma/client';
 import { notFoundHotelError } from '@/errors/not-found-hotel';
 import { invalidIdError } from '@/errors/invalid-info';
-import { bedroomDoesntMatchWithHotelError, notAvailableBedroomError, notFoundBedroomError, repeatedBedroom } from '@/errors/not-found-bedroom';
+import { notAvailableBedroomError, notFoundBedroomError, repeatedBedroom } from '@/errors/not-found-bedroom';
 import userRepository from '@/repositories/user-repository';
 import { invalidDataErrorGeneric } from '@/errors';
 
@@ -22,10 +22,14 @@ export interface BedroomInfo {
 async function getAvailableBedrooms(): Promise<Bedroom[]> {
   const cacheKey = 'bedrooms';
   const cache = await redis.get(cacheKey);
+  //eslint-disable-next-line
+  console.log('Cache: ', cache);
   if (cache) {
     return JSON.parse(cache);
   } else {
     const data = await getBedrooms();
+    //eslint-disable-next-line
+    console.log('Data: ', data);
     redis.set(cacheKey, JSON.stringify(data));
     // redis.setEx(cacheKey, EXPIRATION, JSON.stringify(data));
     return data;
@@ -69,14 +73,18 @@ async function getBedroomByHotelId(id: number): Promise<BedroomInfo[]> {
   return bedroomsFormatted;
 }
 
-async function registerBedroom(bedroomId: number, userId: number) {
+async function registerBedroom(HotelId: number, bedroomId: number, userId: number) {
   const userFind = await userRepository.findUserById(userId);
 
   if (!bedroomId) {
     throw invalidIdError(bedroomId);
   }
 
-  const bedroomExists = await getBedroomById(bedroomId);
+  if (!HotelId) {
+    throw invalidIdError(HotelId);
+  }
+
+  const bedroomExists = await getBedroomById(bedroomId, HotelId);
   if (!bedroomExists) {
     throw notFoundBedroomError();
   }
@@ -84,9 +92,10 @@ async function registerBedroom(bedroomId: number, userId: number) {
     throw notAvailableBedroomError();
   }
 
-  if (userFind.bedroomId === bedroomId) {
+  if (userFind.bedroomId === bedroomId && userFind.Bedroom.hotelId === HotelId) {
     // console.log(userFind);
     // console.log(bedroomExists);
+    //eslint-disable-next-line
     console.log('Mesmo quarto');
     throw repeatedBedroom();
   }
@@ -114,9 +123,10 @@ async function registerBedroom(bedroomId: number, userId: number) {
 
       // console.log(userFind);
       // console.log(bedroomExists);
+      //eslint-disable-next-line
       console.log('Quarto novo');
 
-      const actualizedBedroom = await getBedroomById(bedroomId);
+      const actualizedBedroom = await getBedroomById(bedroomId, HotelId);
       if (
         (actualizedBedroom.guests.length === 1 && actualizedBedroom.typeRoom === 'SINGLE') ||
         (actualizedBedroom.guests.length === 2 && actualizedBedroom.typeRoom === 'DOUBLE') ||
@@ -142,10 +152,19 @@ async function registerBedroom(bedroomId: number, userId: number) {
   redis.del(cacheKey);
 }
 
+function getBedroomsById(id: number, hotelId: number): Promise<BedroomWithGuests> {
+  const bedroom = getBedroomById(id, hotelId);
+  if (!bedroom) {
+    throw notFoundBedroomError();
+  }
+  return bedroom;
+}
+
 export const bedroomsService = {
   getAvailableBedrooms,
   getBedroomByHotelId,
   registerBedroom,
+  getBedroomsById,
 };
 
 export default bedroomsService;

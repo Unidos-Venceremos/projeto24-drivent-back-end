@@ -9,16 +9,16 @@ export async function insertBedroom(bedroomData: CreateBedroom): Promise<Bedroom
 }
 
 export async function getBedrooms(): Promise<Bedroom[]> {
-  return prisma.bedroom.findMany({ where: { available: true } });
+  return prisma.bedroom.findMany();
 }
 
 export async function getBedroomsWithGuests(): Promise<BedroomWithGuests[]> {
-  return prisma.bedroom.findMany({ where: { available: true }, include: { guests: true } });
+  return prisma.bedroom.findMany({ include: { guests: true } });
 }
 
-export async function getBedroomById(id: number): Promise<BedroomWithGuests> {
-  return prisma.bedroom.findUnique({
-    where: { id },
+export async function getBedroomById(id: number, hotelId: number): Promise<BedroomWithGuests> {
+  return prisma.bedroom.findFirst({
+    where: { id, hotelId },
     include: {
       guests: true,
     },
