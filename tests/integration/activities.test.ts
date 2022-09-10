@@ -69,3 +69,20 @@ describe('GET /activities/filter filter by  when token is valid', () => {
     expect(response.body).not.toBe(null);
   });
 });
+
+describe('POST /activities/create should be choice activity available', () => {
+  it('should respond with status 200', async () => {
+    const [userId, token] = await generateValidTokenAndUser();
+    await createAvailableTicketPresentialByUserId(+userId);
+    const date = '2022-10-22';
+    const local = 'Auditório Principal';
+    const activities = await createActivitiesByDate(+userId, date);
+    const activityId = activities[local][0]?.id;
+
+    const response = await server
+      .post('/activities/create/' + activityId, null)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(httpStatus.OK);
+  });
+});
