@@ -19,3 +19,12 @@ export async function getAllActivitiesByDate(req: AuthenticatedRequest, res: Res
 
   return res.status(httpStatus.OK).send(activities);
 }
+
+export async function addActivityInActivitiesUser(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { activityId } = req.params;
+
+  const activities = await activitiesService.createActivityUser(+userId, +activityId);
+
+  return res.status(httpStatus.OK).send(activities);
+}

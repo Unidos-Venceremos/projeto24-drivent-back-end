@@ -1,19 +1,30 @@
 import dayjs from 'dayjs';
-import { Local } from '@prisma/client';
+import { Local, ActivityUser } from '@prisma/client';
 
 import { prisma } from '@/config';
 
+import { Activity } from '@prisma/client';
+
 import activityRepository from '@/repositories/activity-repository';
 import ticketsRepository from '@/repositories/tickets-repository';
+import activityUserRepository from '@/repositories/userActivity-repository';
+import localRepository from '@/repositories/local-repository';
+
 import { notFoundUserTicketError } from '@/errors/not-found-user-ticket';
 import { unauthorizedActivitiesError } from '@/errors/unauthorized-activities';
+
+export type CreateActivityData = Omit<Activity, 'id'>;
 
 interface DaysData {
   [key: string]: string;
 }
 
 interface ActivitiesData {
-  [key: string]: Array<any>;
+  [key: string]: any[];
+}
+
+interface ActivitiesUserData {
+  [key: string]: ActivityUser[];
 }
 
 export async function createLocals() {
@@ -170,8 +181,28 @@ export async function createActivitiesByDate(userId: number, activityDay: string
   const eventsEnd = dayjs(activityDay + ' 23:59').toDate();
 
   const activities = await activityRepository.findAllByDate(eventsInit, eventsEnd);
+  const activitiesUser = await activityUserRepository.findAllByUserId(userId);
 
   const activitiesInLocals: ActivitiesData = {};
+  const activitiesUserInLocals: ActivitiesUserData = {};
+
+  for (let index = 0; index < activitiesUser.length; index++) {
+    const activity = activitiesUser[index];
+
+    if (!activitiesUserInLocals[activity.id]) {
+      activitiesUserInLocals[activity.Activity.id] = [activity];
+    } else {
+      activitiesUserInLocals[activity.Activity.id].push(activity);
+    }
+  }
+
+  const locals = await localRepository.getLocals();
+
+  for (let index = 0; index < locals.length; index++) {
+    const local = locals[index].name;
+
+    activitiesInLocals[local] = [];
+  }
 
   for (let index = 0; index < activities.length; index++) {
     const activity = activities[index];
@@ -181,10 +212,22 @@ export async function createActivitiesByDate(userId: number, activityDay: string
     const startsAtTimezone = dayjs(activity.startsAt).toDate().toString();
     const endsAtTimezone = dayjs(activity.endsAt).toDate().toString();
 
+    const participantActivity = activitiesUserInLocals[activity.id];
+
+    const isParticipant = !!participantActivity;
+
     if (!activitiesInLocals[local]) {
-      activitiesInLocals[local] = [{ ...activity, startsAt: startsAtTimezone, endsAt: endsAtTimezone, duration }];
+      activitiesInLocals[local] = [
+        { ...activity, startsAt: startsAtTimezone, endsAt: endsAtTimezone, duration, isParticipant },
+      ];
     } else {
-      activitiesInLocals[local].push({ ...activity, startsAt: startsAtTimezone, endsAt: endsAtTimezone, duration });
+      activitiesInLocals[local].push({
+        ...activity,
+        startsAt: startsAtTimezone,
+        endsAt: endsAtTimezone,
+        duration,
+        isParticipant,
+      });
     }
   }
 
