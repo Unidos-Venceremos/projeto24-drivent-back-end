@@ -22,7 +22,6 @@ export async function registerBedroom(req: AuthenticatedRequest, res: Response) 
   const intHotelId = +hotelId;
   const intBedroomId = +bedroomId;
   const userId = req.userId;
-  console.log({ userId });
 
   await bedroomService.registerBedroom(intHotelId, intBedroomId, userId);
 
@@ -35,7 +34,5 @@ export async function getBedroomById(req: AuthenticatedRequest, res: Response) {
   const intBedroomId = parseInt(bedroomId);
   const bedroom = await bedroomService.getBedroomsById(intBedroomId, intHotelId);
 
-  //eslint-disabled-next-line
-  console.log(bedroom);
   return res.status(httpStatus.OK).send({ bedroom });
 }
